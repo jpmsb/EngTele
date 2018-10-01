@@ -1,0 +1,172 @@
+#!/bin/bash
+
+echo "Cálculo dos valores dos resistores e capacitores do trabalho final de Eletrônica 1"
+
+read -p "Digite o valor da frequência: " frequencia
+if [ -z "${frequencia}" ]; then
+    echo "É necessário o valor da freqência!!"
+    read -p "Digite o valor da frequência: " frequencia
+else
+
+read -p "Digite o valor de Rl: " Rl
+read -p "Digite o valor de Vcc: " Vcc
+read -p "Digite o valor de icq: " icq
+read -p "Digite o valor de ei: " ei
+read -p "Digite o valor de Rs: " Rs
+read -p "Digite o valor do ganho: " ganho
+read -p "Digite o valor do Bcc: " Bcc
+fi
+
+echo "================================================="
+echo "Frequência de $frequencia Hz"
+echo "Resistência de carga Rl de $Rl ohms"
+echo "Tensão contínua Vcc de $Vcc V"
+echo "Corrente de $icq A no coletor do transistor"
+echo "Corrente ei de $ei A"
+echo "Resistor Rs de $Rs ohms"
+echo "Ganho de $ganho"
+echo "Bcc de $Bcc"
+echo ""
+echo "================================================="
+echo ""
+Vceq=$(bash -c "awk 'BEGIN {print $Vcc * 0.5}'")
+echo "Vce = 50% de Vcc = $Vceq V"
+echo "Vce = $Vceq V"
+echo ""
+echo "================================================="
+Vrc=$(bash -c "awk 'BEGIN {print $Vcc * 0.4}'")
+echo "Vrc = 40% de Vcc = $Vrc V"
+echo "Vrc = $Vrc V"
+echo ""
+echo "================================================="
+Vre=$(bash -c "awk 'BEGIN {print $Vcc * 0.1}'")
+echo "Vre = 10% de Vcc = $Vre V"
+echo "Vre = $Vre V"
+echo ""
+echo "================================================="
+Rc=$(bash -c "awk 'BEGIN {print $Vrc / $icq}'")
+echo "Rc = Vrc/Ic = $Vrc/$icq = $Rc ohms"
+echo "Rc = $Rc ohms"
+echo ""
+echo "================================================="
+ie=$icq
+RE=$(bash -c "awk 'BEGIN {print $Vre / $ie}'")
+echo "RE = Vre/ie = $Vre/$ie = $RE ohms"
+echo "RE = $RE ohms"
+echo ""
+echo "================================================="
+Vbe=0.7
+Vth=$(bash -c "awk 'BEGIN {print $Vbe + $Vre}'")
+echo "Vth = Vbe + Vre = $Vbe + $Vre = $Vth V"
+echo "Vth = $Vth V"
+echo ""
+echo "================================================="
+R2=$(bash -c "awk 'BEGIN {print 0.01 * ($Bcc + 1) * $RE}'")
+echo "R2 <= 0.01(B + 1)Re = 0.01($Bcc + 1)$RE = $R2"
+echo "R2 = $R2 ohms"
+echo ""
+echo "================================================="
+R1=$(bash -c "awk 'BEGIN {print ($R2 * ($Vcc - $Vth)) / $Vth}'")
+echo "R1 = R2 * (Vcc - Vth)/Vth = $R2 * ($Vcc - $Vth)/$Vth = $R1 ohms"
+echo "R1 = $R1 ohms"
+echo ""
+echo "================================================="
+echo ""
+echo "                  Análise CA"
+echo ""
+echo "================================================="
+echo ""
+echo "Cálculo do re':"
+re_linha=$(bash -c "awk 'BEGIN {print 0.025 / $ie}'")
+echo "re' = 25mV / $ie = $re_linha"
+echo "re' = $re_linha ohms"
+echo ""
+echo "=================================================="
+rc=$(bash -c "awk 'BEGIN {print ($Rc * $Rl) / ($Rc + $Rl)}'")
+echo "rc = Rc//Rl = ($Rc * $Rl) / ($Rc + $Rl) = $rc"
+echo "rc = $rc ohms"
+echo ""
+echo "=================================================="
+re=$(bash -c "awk 'BEGIN {print ($rc - ($ganho * $re_linha)) / $ganho}'")
+echo "re = (rc - ganho*re') / ganho = ($rc + $ganho*$re_linha) / $ganho = $re"
+echo "re = $re ohms"
+echo ""
+echo "=================================================="
+Re=$(bash -c "awk 'BEGIN {print $RE - $re}'")
+echo "Re = RE - re = $RE - $re = $Re"
+echo "Re = $Re ohms"
+echo ""
+echo "=================================================="
+Zent=$(bash -c "awk 'BEGIN {print 1 / ((1 / $R1) + (1 / $R2) + (1 / ($Bcc * $Re)))}'")
+echo "Zent = 1 / ((1 / R1) + (1 / R2) + (1 / (Bcc * Re))))"
+echo "Zent = 1 / ((1 / $R1) + (1 / $R2) + (1 / ($Bcc * $Re)))) = $Zent ohms"
+echo "Zent = $Zent ohms"
+echo ""
+echo "=================================================="
+echo "Vce máx = Vcc para Ic = 0"
+echo "Ic máx = (Vcc / Rc + Re) para Vce = 0"
+Vce=0
+Icmax=$(bash -c "awk 'BEGIN {print $Vcc / ($Rc + $Re)}'")
+echo "Ic máx = $Vcc / $Rc + $Re = $Icmax A"
+echo "Ic máx = $Icmax A"
+echo ""
+echo ""
+echo "=================================================="
+echo ""
+echo "                Reta de caga CA"
+echo ""
+echo "=================================================="
+Icmax=$(bash -c "awk 'BEGIN {print (($Vceq - $Vce) / $rc) + $icq}'")
+echo "Icmax = ((Vceq - Vce) / rc) + icq"
+echo "Icmax = (($Vceq - $Vce) / $rc) + $icq = $Icmax A"
+echo "Icmax = $Icmax A"
+echo ""
+echo "=================================================="
+Vcecorte=$(bash -c "awk 'BEGIN {print $Vceq + ($icq * $rc)}'")
+echo "Vcecorte = Vceq + (icq * rc) = $Vceq + ($icq * $rc) = $Vcecorte V"
+echo "Vcecorte = $Vcecorte V"
+echo ""
+echo "=================================================="
+Icqrc=$(bash -c "awk 'BEGIN {print $icq * $rc}'")
+echo "Compilance → menor valor entre $Vceq e $Icqrc"
+echo ""
+echo "=================================================="
+echo "Novo Vent"
+Vent=$(bash -c "awk 'BEGIN {print $ei * ($Zent / ($Zent + $Rs))}'")
+echo "Vent = ei * (Zent / (Zent + Rs)) = $ei * ($Zent / $Zent + $Rs) = $Vent V"
+echo "Vent = $Vent V"
+echo ""
+echo "=================================================="
+echo ""
+echo "          Cálculo dos capacitores"
+echo ""
+echo "=================================================="
+pi=$(echo "scale=20; 4*a(1)" | bc -l)
+echo ""
+Xc1=$(bash -c "awk 'BEGIN {print ($Rs + $Zent) / 10}'")
+C1=$(bash -c "awk 'BEGIN {print 1 / (2 * $pi * $frequencia * $Xc1)}'")
+echo "Xc1 = (Rs + Zent) / 10 = ($Rs + $Zent) / 10 = $Xc1 F"
+echo "Xc1 = $Xc1 ohms"
+echo ""
+echo "C1 = 1 / 2πfXc1 = 1 / 2 * $pi * $frequencia * $Xc1 = $C1 F"
+echo "C1 = $C1 F"
+echo ""
+echo "=================================================="
+Xc2=$(bash -c "awk 'BEGIN {print ($Rc + $Rl) / 10}'")
+C2=$(bash -c "awk 'BEGIN {print 1 / (2 * $pi * $frequencia * $Xc2)}'")
+echo "Xc2 = (Rc + Rl) /10 = ($Rc + $Rl) / 10 = $Xc2 ohms"
+echo "Xc2 = $Xc2 ohms"
+echo ""
+echo "C2 = 1 / 2πfXc2 = 1 / 2 * $pi * $frequencia * $Xc2 = $C2 F"
+echo "C2 = $C2 F"
+echo ""
+echo "=================================================="
+Xc3=$(bash -c "awk 'BEGIN {print ((($re_linha + $re) * $Re) / (($re_linha + $re) + $Re)) / 10}'")
+C3=$(bash -c "awk 'BEGIN {print 1 / (2 * $pi * $frequencia * $Xc3)}'")
+echo "Xc3 = (((re' + re) * Re / ((re' + re) + Re)) / 10"
+echo "Xc3 = ((($re_linha + $re) * $Re) / (($re_linha + $re) + $Re)) / 10 = $Xc3 F"
+echo "Xc3 = $Xc3 ohms"
+echo ""
+echo "C3 = 1 / 2πfXc3 = 1 / 2 * $pi * $frequencia * $Xc3 = $C3 F"
+echo "C3 = $C3 F"
+echo ""
