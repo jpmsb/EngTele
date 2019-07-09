@@ -87,20 +87,20 @@ echo "rc = Rc//Rl = ($Rc * $Rl) / ($Rc + $Rl) = $rc"
 echo "rc = $rc ohms"
 echo ""
 echo "=================================================="
-re=$(bash -c "awk 'BEGIN {print ($rc - ($ganho * $re_linha)) / $ganho}'")
-echo "re = (rc - ganho*re') / ganho = ($rc + $ganho*$re_linha) / $ganho = $re"
+Zent=$(bash -c "awk 'BEGIN {print 1 / ((1 / $R1) + (1 / $R2) )}'")
+echo "Zent = 1 / ((1 / R1) + (1 / R2))"
+echo "Zent = 1 / ((1 / $R1) + (1 / $R2)) = $Zent ohms"
+echo "Zent = $Zent ohms"
+echo ""
+echo "=================================================="
+re=$(bash -c "awk 'BEGIN {print ((($Zent / ($Zent + $Rs)) * ($Rl / ($Rc + $Rl)) * $Rc) / $ganho) - $re_linha}'")
+echo "re = (((Zent / (Zent + Rs)) * (Rl / (Rc + Rl)) * Rc) / ganho) - re' = ((($Zent / ($Zent + $Rs)) * ($Rl / ($Rc + $Rl)) * $Rc) / $ganho) - $re_linha = $re"
 echo "re = $re ohms"
 echo ""
 echo "=================================================="
 Re=$(bash -c "awk 'BEGIN {print $RE - $re}'")
 echo "Re = RE - re = $RE - $re = $Re"
 echo "Re = $Re ohms"
-echo ""
-echo "=================================================="
-Zent=$(bash -c "awk 'BEGIN {print 1 / ((1 / $R1) + (1 / $R2) + (1 / ($Bcc * $Re)))}'")
-echo "Zent = 1 / ((1 / R1) + (1 / R2) + (1 / (Bcc * Re))))"
-echo "Zent = 1 / ((1 / $R1) + (1 / $R2) + (1 / ($Bcc * $Re)))) = $Zent ohms"
-echo "Zent = $Zent ohms"
 echo ""
 echo "=================================================="
 echo "Vce máx = Vcc para Ic = 0"
